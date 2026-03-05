@@ -17,15 +17,20 @@ public abstract class AbstractRepository<ID, E>
 
     @Override
     public List<E> findAll() {
-        return (List<E>)StreamSupport.stream(entities.values().spliterator(), false).toList();
+        return StreamSupport.stream(entities.values().spliterator(), false).toList();
 //                    .collect(Collectors.toList());
         // return (List<E>) entities.values();
     }
 
     @Override
     public E save(E entity) {
-        entities.put(getId(entity), entity);
-        return entity;
+
+        ID id = getId(entity);
+
+        if (entities.containsKey(id))
+            return null;
+
+        return entities.put(id, entity);
     }
 
     @Override
@@ -35,8 +40,13 @@ public abstract class AbstractRepository<ID, E>
 
     @Override
     public E update(E entity) {
-        entities.put(getId(entity), entity);
-        return entity;
+
+        ID id = getId(entity);
+
+        if (!entities.containsKey(id))
+            return null;
+
+        return entities.put(id, entity);
     }
 
     protected abstract ID getId(E entity);

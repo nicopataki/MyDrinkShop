@@ -9,7 +9,7 @@ public abstract class FileAbstractRepository<ID, E>
 
     protected String fileName;
 
-    public FileAbstractRepository(String fileName) {
+    protected FileAbstractRepository(String fileName) {
         this.fileName = fileName;
         //loadFromFile();
     }
@@ -19,6 +19,8 @@ public abstract class FileAbstractRepository<ID, E>
 
             String line;
             while ((line = br.readLine()) != null) {
+                if (line.trim().isEmpty())
+                    continue;
                 E entity = extractEntity(line);
                 super.save(entity);
             }
