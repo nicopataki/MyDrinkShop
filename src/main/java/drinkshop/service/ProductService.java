@@ -3,6 +3,7 @@ package drinkshop.service;
 import drinkshop.domain.*;
 import drinkshop.repository.Repository;
 import drinkshop.service.validator.ProductValidator;
+import drinkshop.service.validator.ValidationException;
 import drinkshop.service.validator.Validator;
 
 import java.util.List;
@@ -20,7 +21,10 @@ public class ProductService {
 
     public void addProduct(Product p) {
         validator.validate(p);
-        productRepo.save(p);
+        Product saved = productRepo.save(p);
+        if (saved != null) { // modificat
+            throw new ValidationException("Exista deja un produs cu ID-ul " + p.getId());
+        }
     }
 
     public void updateProduct(int id, String name, double price, CategorieBautura categorie, TipBautura tip) {

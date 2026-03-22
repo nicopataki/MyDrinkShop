@@ -2,6 +2,7 @@ package drinkshop.ui;
 
 import drinkshop.domain.*;
 import drinkshop.service.*;
+import drinkshop.service.validator.ValidationException;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -148,14 +149,26 @@ public void setServices(ProductService productService,
             alert.showAndWait();
             return;
         }
+
+        double price;
+        try {
+            price = Double.parseDouble(txtProdPrice.getText());
+        } catch (NumberFormatException ex) {
+            showError("Pret invalid. Introdu o valoare numerica.");
+            return;
+        }
+
         Product p = new Product(r.getId(),
                 txtProdName.getText(),
-                Double.parseDouble(txtProdPrice.getText()),
+                price,
                 comboProdCategorie.getValue(),
                 comboProdTip.getValue());
-        //service.addProduct(p);
-        productService.addProduct(p);
-        initData();
+        try {
+            productService.addProduct(p);
+            initData();
+        } catch (ValidationException ex) {
+            showError(ex.getMessage());
+        }
     }
 
     @FXML

@@ -27,10 +27,11 @@ public abstract class AbstractRepository<ID, E>
 
         ID id = getId(entity);
 
-        if (entities.containsKey(id))
-            return null;
+        if (entities.containsKey(id)) // modificat
+            return entities.get(id);
 
-        return entities.put(id, entity);
+        entities.put(id, entity);
+        return null;
     }
 
     @Override
