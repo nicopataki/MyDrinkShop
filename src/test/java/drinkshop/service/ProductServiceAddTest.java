@@ -7,11 +7,11 @@ import drinkshop.repository.AbstractRepository;
 import drinkshop.service.validator.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.MethodOrderer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -90,6 +90,68 @@ class ProductServiceAddTest {
         assertNotNull(found);
         assertEquals("Americano", found.getNume());
         assertEquals(0.01, found.getPret());
+    }
+
+    @Test
+    @Order(5)
+    @DisplayName("ECP valid: second valid partition sample is saved")
+    @Tag("ECP")
+    void addProduct_secondValidProduct_isSaved() {
+        // Arrange
+        Product p = new Product(3, "Fresh Orange", 12.0, CategorieBautura.JUICE, TipBautura.WATER_BASED);
+
+        // Act
+        service.addProduct(p);
+
+        // Assert
+        Product found = service.findById(3);
+        assertNotNull(found);
+        assertEquals("Fresh Orange", found.getNume());
+        assertEquals(12.0, found.getPret());
+    }
+
+    @Test
+    @Order(6)
+    @DisplayName("ECP invalid: blank name throws ValidationException")
+    @Tag("ECP")
+    void addProduct_blankName_throwsValidationException() {
+        // Arrange
+        Product invalid = new Product(4, "   ", 11.0, CategorieBautura.TEA, TipBautura.BASIC);
+
+        // Act + Assert
+        ValidationException ex = assertThrows(ValidationException.class, () -> service.addProduct(invalid));
+        assertTrue(ex.getMessage().contains("Numele"));
+    }
+
+    @Test
+    @Order(7)
+    @DisplayName("BVA invalid: id at lower boundary 0 is rejected")
+    @Tag("BVA")
+    void addProduct_idZero_throwsValidationException() {
+        // Arrange
+        Product invalid = new Product(0, "Mocha", 13.0, CategorieBautura.MILK_COFFEE, TipBautura.DAIRY);
+
+        // Act + Assert
+        ValidationException ex = assertThrows(ValidationException.class, () -> service.addProduct(invalid));
+        assertTrue(ex.getMessage().contains("ID"));
+    }
+
+    @Test
+    @Order(8)
+    @DisplayName("BVA valid: id lower valid boundary 1 is accepted")
+    @Tag("BVA")
+    void addProduct_idOne_isAccepted() {
+        // Arrange
+        Product boundaryValid = new Product(1, "Black Tea", 8.0, CategorieBautura.TEA, TipBautura.BASIC);
+
+        // Act
+        service.addProduct(boundaryValid);
+
+        // Assert
+        Product found = service.findById(1);
+        assertNotNull(found);
+        assertEquals("Black Tea", found.getNume());
+        assertEquals(8.0, found.getPret());
     }
 
     private static class InMemoryProductRepository extends AbstractRepository<Integer, Product> {

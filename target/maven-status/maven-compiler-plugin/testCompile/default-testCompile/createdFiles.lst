@@ -1,2 +1,3 @@
+drinkshop\domain\ProductTest.class
 drinkshop\service\ProductServiceAddTest.class
 drinkshop\service\ProductServiceAddTest$InMemoryProductRepository.class
