@@ -23,11 +23,11 @@ public class Stoc {
         return ingredient;
     }
 
-    public double getCantitate() {
+    public int getCantitate() {
         return cantitate;
     }
 
-    public double getStocMinim() {
+    public int getStocMinim() {
         return stocMinim;
     }
 

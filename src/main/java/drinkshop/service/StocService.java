@@ -7,6 +7,7 @@ import drinkshop.repository.Repository;
 import drinkshop.service.validator.StocValidator;
 import drinkshop.service.validator.Validator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -66,9 +67,15 @@ public class StocService {
             String ingredient = e.getDenumire();
             double necesar = e.getCantitate();
 
-            List<Stoc> ingredienteStoc = stocRepo.findAll().stream()
+            /*List<Stoc> ingredienteStoc = stocRepo.findAll().stream()
                     .filter(s -> s.getIngredient().equalsIgnoreCase(ingredient))
-                    .toList();
+                    .toList();*/
+            List<Stoc> ingredienteStoc = new ArrayList<>();
+            for (Stoc s : stocRepo.findAll()) {
+                if (s.getIngredient().equalsIgnoreCase(ingredient)) {
+                    ingredienteStoc.add(s);
+                }
+            }
 
             double ramas = necesar;
 
