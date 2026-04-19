@@ -1,4 +1,4 @@
-1,cafea_macinata:7.0,apa:30.0
+1,null:0.0
 2,cafea_macinata:7.0,lapte:120.0
 3,cafea_macinata:7.0,lapte:180.0
 4,matcha_pudra:5.0,lapte:150.0,selectedProd:1.0

@@ -10,4 +10,6 @@ module drinkshop {
 
     opens drinkshop.domain to  javafx.base;
     exports drinkshop.domain;
+    exports drinkshop.service.validator;
+    exports drinkshop.repository;
 }

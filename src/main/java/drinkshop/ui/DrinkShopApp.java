@@ -1,12 +1,14 @@
 package drinkshop.ui;
 
 import drinkshop.domain.*;
+import drinkshop.reports.DailyReportService;
 import drinkshop.repository.Repository;
 import drinkshop.repository.file.FileOrderRepository;
 import drinkshop.repository.file.FileProductRepository;
 import drinkshop.repository.file.FileRetetaRepository;
 import drinkshop.repository.file.FileStocRepository;
-import drinkshop.service.DrinkShopService;
+import drinkshop.service.*;
+import drinkshop.service.validator.RetetaValidator;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -24,8 +26,18 @@ public class DrinkShopApp extends Application {
         Repository<Integer, Stoc> stocRepo = new FileStocRepository("data/stocuri.txt");
 
         // ---------- Initializare Service ----------
-        DrinkShopService service = new DrinkShopService(productRepo, orderRepo, retetaRepo, stocRepo);
+        //DrinkShopService service = new DrinkShopService(productRepo, orderRepo, retetaRepo, stocRepo);
 
+        // ---------- Service-uri ----------
+        ProductService productService = new ProductService(productRepo);
+        OrderService orderService = new OrderService(orderRepo, productRepo);
+        RetetaService retetaService = new RetetaService(retetaRepo, new RetetaValidator());
+        StocService stocService = new StocService(stocRepo);
+        DailyReportService reportService = new DailyReportService(orderRepo);
+
+// orchestrator
+        DrinkShopService drinkShopService =
+                new DrinkShopService(productService, orderService, retetaService, stocService, reportService);
         // ---------- Incarcare FXML ----------
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("drinkshop.fxml"));
@@ -33,7 +45,14 @@ public class DrinkShopApp extends Application {
 
         // ---------- Setare Service in Controller ----------
         DrinkShopController controller = loader.getController();
-        controller.setService(service);
+        //controller.setService(service);
+        controller.setServices(
+                productService,
+                orderService,
+                retetaService,
+                stocService,
+                drinkShopService
+        );
 
         // ---------- Afisare Fereastra ----------
         stage.setTitle("Coffee Shop Management");

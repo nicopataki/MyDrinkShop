@@ -1,7 +1,8 @@
 package drinkshop.ui;
 
 import drinkshop.domain.*;
-import drinkshop.service.DrinkShopService;
+import drinkshop.service.*;
+import drinkshop.service.validator.ValidationException;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,7 +15,11 @@ import java.util.stream.Collectors;
 
 public class DrinkShopController {
 
-    private DrinkShopService service;
+    private ProductService productService;
+    private OrderService orderService;
+    private RetetaService retetaService;
+    private StocService stocService;
+    private DrinkShopService drinkShopService;
 
     // ---------- PRODUCT ----------
     @FXML private TableView<Product> productTable;
@@ -55,8 +60,22 @@ public class DrinkShopController {
 
     private Order currentOrder = new Order(1);
 
-    public void setService(DrinkShopService service) {
-        this.service = service;
+    //    public void setService(DrinkShopService service) {
+//        this.service = service;
+//        initData();
+//    }
+    public void setServices(ProductService productService,
+                            OrderService orderService,
+                            RetetaService retetaService,
+                            StocService stocService,
+                            DrinkShopService drinkShopService) {
+
+        this.productService = productService;
+        this.orderService = orderService;
+        this.retetaService = retetaService;
+        this.stocService = stocService;
+        this.drinkShopService = drinkShopService;
+
         initData();
     }
 
@@ -102,9 +121,12 @@ public class DrinkShopController {
     }
 
     private void initData() {
-        productList.setAll(service.getAllProducts());
-        retetaList.setAll(service.getAllRetete());
-        lblTotalRevenue.setText("Daily Revenue: " + service.getDailyRevenue());
+//        productList.setAll(service.getAllProducts());
+//        retetaList.setAll(service.getAllRetete());
+//        lblTotalRevenue.setText("Daily Revenue: " + service.getDailyRevenue());
+        productList.setAll(productService.getAllProducts());
+        retetaList.setAll(retetaService.getAll());
+        lblTotalRevenue.setText("Daily Revenue: " + drinkShopService.getDailyRevenue());
         updateOrderTotal();
     }
 
@@ -120,27 +142,40 @@ public class DrinkShopController {
             alert.showAndWait();
             return;
         }else
-        if (service.getAllProducts().stream().filter(p->p.getId()==r.getId()).toList().size()>0) {
+        if (productService.getAllProducts().stream().filter(p->p.getId()==r.getId()).toList().size()>0) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Error");
             alert.setHeaderText("Exista un produs cu reteta adaugata.");
             alert.showAndWait();
             return;
         }
+
+        double price;
+        try {
+            price = Double.parseDouble(txtProdPrice.getText());
+        } catch (NumberFormatException ex) {
+            showError("Pret invalid. Introdu o valoare numerica.");
+            return;
+        }
+
         Product p = new Product(r.getId(),
                 txtProdName.getText(),
-                Double.parseDouble(txtProdPrice.getText()),
+                price,
                 comboProdCategorie.getValue(),
                 comboProdTip.getValue());
-        service.addProduct(p);
-        initData();
+        try {
+            productService.addProduct(p);
+            initData();
+        } catch (ValidationException ex) {
+            showError(ex.getMessage());
+        }
     }
 
     @FXML
     private void onUpdateProduct() {
         Product selected = productTable.getSelectionModel().getSelectedItem();
         if (selected == null) return;
-        service.updateProduct(selected.getId(), txtProdName.getText(),
+        productService.updateProduct(selected.getId(), txtProdName.getText(),
                 Double.parseDouble(txtProdPrice.getText()),
                 comboProdCategorie.getValue(), comboProdTip.getValue());
         initData();
@@ -150,18 +185,18 @@ public class DrinkShopController {
     private void onDeleteProduct() {
         Product selected = productTable.getSelectionModel().getSelectedItem();
         if (selected == null) return;
-        service.deleteProduct(selected.getId());
+        productService.deleteProduct(selected.getId());
         initData();
     }
 
     @FXML
     private void onFilterCategorie() {
-        productList.setAll(service.filtreazaDupaCategorie(comboProdCategorie.getValue()));
+        productList.setAll(productService.filterByCategorie(comboProdCategorie.getValue()));
     }
 
     @FXML
     private void onFilterTip() {
-        productList.setAll(service.filtreazaDupaTip(comboProdTip.getValue()));
+        productList.setAll(productService.filterByTip(comboProdTip.getValue()));
     }
 
     // ---------- RETETA NOUA ----------
@@ -179,8 +214,8 @@ public class DrinkShopController {
 
     @FXML
     private void onAddNewReteta() {
-        Reteta r = new Reteta(service.getAllRetete().size()+1, new ArrayList<>(newRetetaList));
-        service.addReteta(r);
+        Reteta r = new Reteta(retetaService.getAll().size()+1, new ArrayList<>(newRetetaList));
+        retetaService.addReteta(r);
         newRetetaList.clear();
         initData();
     }
@@ -226,8 +261,8 @@ public class DrinkShopController {
         currentOrder.getItems().addAll(currentOrderItems);
         currentOrder.computeTotalPrice();
 
-        service.addOrder(currentOrder);
-        txtReceipt.setText(service.generateReceipt(currentOrder));
+        orderService.addOrder(currentOrder);
+        txtReceipt.setText(drinkShopService.generateReceipt(currentOrder));
 
         currentOrderItems.clear();
         currentOrder = new Order(currentOrder.getId() + 1);
@@ -237,19 +272,19 @@ public class DrinkShopController {
     private void updateOrderTotal() {
         currentOrder.getItems().clear();
         currentOrder.getItems().addAll(currentOrderItems);
-        double total = service.computeTotal(currentOrder);
+        double total = orderService.computeTotal(currentOrder);
         lblOrderTotal.setText("Total: " + total);
     }
 
     // ---------- EXPORT + REVENUE ----------
     @FXML
     private void onExportOrdersCsv() {
-        service.exportCsv("orders.csv");
+        drinkShopService.exportCsv("orders.csv");
     }
 
     @FXML
     private void onDailyRevenue() {
-        lblTotalRevenue.setText("Daily Revenue: " + service.getDailyRevenue());
+        lblTotalRevenue.setText("Daily Revenue: " + drinkShopService.getDailyRevenue());
     }
 
     private void showError(String msg) {
