@@ -3,7 +3,7 @@ package drinkshop.receipt;
 import drinkshop.domain.Order;
 import drinkshop.domain.OrderItem;
 import drinkshop.domain.Product;
-
+import java.util.stream.Collectors;
 import java.util.List;
 
 public class ReceiptGenerator {

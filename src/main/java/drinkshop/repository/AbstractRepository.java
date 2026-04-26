@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.StreamSupport;
+import java.util.stream.Collectors;
 
 public abstract class AbstractRepository<ID, E>
         implements Repository<ID, E> {

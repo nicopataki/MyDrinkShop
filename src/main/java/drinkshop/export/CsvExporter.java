@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
-
+import java.util.stream.Collectors;
 public class CsvExporter {
     public static void exportOrders(List<Product> products, List<Order> orders, String path) {
         try (FileWriter w = new FileWriter(path)) {
