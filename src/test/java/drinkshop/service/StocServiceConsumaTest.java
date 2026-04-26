@@ -24,19 +24,17 @@ class StocServiceConsumaTest {
     void setUp() throws Exception {
         Files.writeString(
                 Path.of("data/stocuri.txt"),
-                """
-                1;cafea_macinata;1000;300
-                2;apa;10000;2000
-                3;lapte;5000;1000
-                4;lapte_ovaz;3000;800
-                5;matcha_pudra;500;100
-                6;taro_pudra;500;100
-                7;tapioca;2000;500
-                8;ceai_verde;300;80
-                9;lamaie;1000;200
-                10;zahar;2000;500
-                11;zahar;1000;500
-                """
+                "1;cafea_macinata;1000;300\n" +
+                        "2;apa;10000;2000\n" +
+                        "3;lapte;5000;1000\n" +
+                        "4;lapte_ovaz;3000;800\n" +
+                        "5;matcha_pudra;500;100\n" +
+                        "6;taro_pudra;500;100\n" +
+                        "7;tapioca;2000;500\n" +
+                        "8;ceai_verde;300;80\n" +
+                        "9;lamaie;1000;200\n" +
+                        "10;zahar;2000;500\n" +
+                        "11;zahar;1000;500\n"
         );
 
         repo = new FileStocRepository("data/stocuri.txt");
